@@ -1,0 +1,46 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+
+jobs:
+  ci:
+    docker:
+      - image: cimg/node:20.5
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "pnpm-lock.yaml" }}
+
+      - run:
+          name: Install dependencies
+          command: pnpm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-deps-{{ checksum "pnpm-lock.yaml" }}
+
+      - run:
+          name: Lint
+          command: pnpm run lint
+
+      - run:
+          name: Tests
+          command: pnpm run test -- --coverage
+
+      - run:
+          name: Build
+          command: pnpm run build
+
+      - store_artifacts:
+          path: coverage
+
+workflows:
+  version: 2
+  pipeline:
+    jobs:
+      - ci
