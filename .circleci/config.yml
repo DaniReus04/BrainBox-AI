@@ -3,44 +3,71 @@ version: 2.1
 orbs:
   node: circleci/node@5.1.0
 
-jobs:
-  ci:
-    docker:
-      - image: cimg/node:20.5
-
+commands:
+  setup_pnpm:
+    description: Install pnpm and project dependencies
     steps:
-      - checkout
-
+      - run:
+          name: Install pnpm
+          command: |
+            sudo corepack enable
+            corepack prepare pnpm@latest --activate
       - restore_cache:
           keys:
             - v1-deps-{{ checksum "pnpm-lock.yaml" }}
-
       - run:
           name: Install dependencies
-          command: pnpm install
-
+          command: pnpm install --frozen-lockfile
       - save_cache:
           paths:
             - node_modules
           key: v1-deps-{{ checksum "pnpm-lock.yaml" }}
 
+jobs:
+  ci:
+    docker:
+      - image: cimg/node:20.5
+    steps:
+      - checkout
+      - setup_pnpm
       - run:
           name: Lint
           command: pnpm run lint
-
       - run:
           name: Tests
           command: pnpm run test -- --coverage
-
       - run:
           name: Build
           command: pnpm run build
-
       - store_artifacts:
           path: coverage
 
+  deploy:
+    docker:
+      - image: cimg/node:20.5
+    steps:
+      - checkout
+      - setup_pnpm
+      - run:
+          name: Install Vercel CLI
+          command: pnpm add -g vercel
+      - run:
+          name: Pull Vercel Environment
+          command: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      - run:
+          name: Build with Vercel
+          command: vercel build --prod --token=$VERCEL_TOKEN
+      - run:
+          name: Deploy to Vercel
+          command: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
 workflows:
-  version: 2
   pipeline:
     jobs:
       - ci
+      - deploy:
+          requires:
+            - ci
+          filters:
+            branches:
+              only: main
