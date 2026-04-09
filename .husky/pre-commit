@@ -1,0 +1,4 @@
+echo "Running lint..."
+pnpm lint
+
+echo "Pre-commit checks passed successfully!"

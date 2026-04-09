@@ -1,0 +1,7 @@
+echo "Running lint..."
+pnpm lint
+
+echo "Running tests..."
+pnpm test
+
+echo "Pre-push checks passed successfully!"

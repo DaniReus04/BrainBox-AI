@@ -1,0 +1,154 @@
+module.exports = {
+  types: [
+    { value: 'feat', name: 'feat:     A new feature' },
+    { value: 'fix', name: 'fix:      A bug fix' },
+    { value: 'docs', name: 'docs:     Documentation only changes' },
+    { value: 'style', name: 'style:    Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)' },
+    { value: 'refactor', name: 'refactor: A code change that neither fixes a bug nor adds a feature' },
+    { value: 'perf', name: 'perf:     A code change that improves performance' },
+    { value: 'test', name: 'test:     Adding missing tests or correcting existing tests' },
+    { value: 'chore', name: 'chore:    Changes to the build process or auxiliary tools and libraries such as documentation generation' },
+    { value: 'ci', name: 'ci:       Changes to our CI configuration files and scripts' },
+    { value: 'build', name: 'build:    Changes that affect the build system or external dependencies' },
+    { value: 'revert', name: 'revert:   Reverts a previous commit' }
+  ],
+
+  scopes: [
+    { name: 'app' },
+    { name: 'components' },
+    { name: 'pages' },
+    { name: 'utils' },
+    { name: 'hooks' },
+    { name: 'store' },
+    { name: 'api' },
+    { name: 'config' },
+    { name: 'tests' },
+    { name: 'deps' },
+    { name: 'ci' },
+    { name: 'docs' }
+  ],
+
+  scopeOverrides: {
+    feat: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' },
+      { name: 'hooks' },
+      { name: 'store' },
+      { name: 'api' }
+    ],
+    fix: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' },
+      { name: 'hooks' },
+      { name: 'store' },
+      { name: 'api' }
+    ],
+    docs: [
+      { name: 'docs' },
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' }
+    ],
+    style: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' }
+    ],
+    refactor: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' },
+      { name: 'hooks' },
+      { name: 'store' },
+      { name: 'api' }
+    ],
+    perf: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'api' },
+      { name: 'store' }
+    ],
+    test: [
+      { name: 'tests' },
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' },
+      { name: 'hooks' },
+      { name: 'store' },
+      { name: 'api' }
+    ],
+    chore: [
+      { name: 'deps' },
+      { name: 'config' },
+      { name: 'ci' },
+      { name: 'docs' }
+    ],
+    ci: [
+      { name: 'ci' },
+      { name: 'config' }
+    ],
+    build: [
+      { name: 'config' },
+      { name: 'deps' }
+    ],
+    revert: [
+      { name: 'app' },
+      { name: 'components' },
+      { name: 'pages' },
+      { name: 'utils' },
+      { name: 'hooks' },
+      { name: 'store' },
+      { name: 'api' }
+    ]
+  },
+
+  allowCustomScopes: false,
+  allowBreakingChanges: ['feat', 'fix', 'refactor', 'perf'],
+  skipQuestions: ['footerPrefix'],
+  subjectLimit: 100,
+  subjectSeparator: ': ',
+  subjectEmptyWarning: 'Subject cannot be empty',
+  subjectLimitWarning: 'Subject is too long',
+  typePrefix: '',
+  typeEmptyWarning: 'Type cannot be empty',
+  typeInvalidWarning: 'Type is invalid',
+  scopeEmptyWarning: 'Scope cannot be empty',
+  scopeInvalidWarning: 'Scope is invalid',
+  bodyLimit: 200,
+  bodyLimitWarning: 'Body is too long',
+  footerLimit: 100,
+  footerLimitWarning: 'Footer is too long',
+  confirmColorize: true,
+  maxHeaderWidth: 100,
+  maxLineWidth: 100,
+  useEmoji: false,
+  emojiAlign: 'center',
+  useAI: false,
+  aiNumber: 3,
+  upperCaseSubject: false,
+  markBreakingChangeMode: true,
+  allowTicketNumber: false,
+  isTicketNumberRequired: false,
+  ticketNumberPrefix: 'TICKET-',
+  ticketNumberRegExp: '\\d{1,5}',
+  confirmBreakingChange: true,
+  breakingChangePrefix: 'BREAKING CHANGE:',
+  footerPrefix: 'ISSUES CLOSED:',
+  askForBreakingChangeFirst: false,
+  breaklineChar: '|',
+  issuePrefixes: ['#', 'gh-'],
+  customIssuePrefixAlign: 'top',
+  emptyIssuePrefixAlias: 'skip',
+  customIssuePrefixAlias: 'custom',
+  allowCustomIssuePrefix: true,
+  allowEmptyIssuePrefix: true,
+  confirmCommit: true,
+  confirmCommitMessage: 'Do you want to proceed with the commit above?'
+};
