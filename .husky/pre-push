@@ -2,6 +2,6 @@ echo "Running lint..."
 pnpm lint
 
 echo "Running tests..."
-pnpm test
+pnpm test:run
 
 echo "Pre-push checks passed successfully!"
