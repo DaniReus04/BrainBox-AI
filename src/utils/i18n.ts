@@ -21,6 +21,11 @@ i18n
           welcome: "Bem-vindo ao BrainBox AI",
         },
       },
+      es: {
+        translation: {
+          welcome: "Bienvenido al BrainBox AI",
+        },
+      },
     },
   });
 
