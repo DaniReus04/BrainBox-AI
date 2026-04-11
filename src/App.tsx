@@ -1,9 +1,10 @@
 import "./App.css";
+import { Loading } from "./components/ui/loading";
 
 function App() {
   return (
     <div>
-      <h1>BrainBox AI</h1>
+      <Loading />
     </div>
   );
 }

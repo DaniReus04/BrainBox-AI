@@ -14,16 +14,19 @@ i18n
       en: {
         translation: {
           welcome: "Welcome to BrainBox AI",
+          version: "Version",
         },
       },
       pt: {
         translation: {
           welcome: "Bem-vindo ao BrainBox AI",
+          version: "Versão",
         },
       },
       es: {
         translation: {
           welcome: "Bienvenido al BrainBox AI",
+          version: "Versión",
         },
       },
     },

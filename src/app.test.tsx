@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import App from "./App";
 
 describe("App", () => {
-  it("should render the application title", () => {
+  it("should render the loading screen", () => {
     render(<App />);
-    expect(screen.getByText("BrainBox AI")).toBeInTheDocument();
+    expect(screen.getByText("BrainBox")).toBeInTheDocument();
   });
 });
