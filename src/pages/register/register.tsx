@@ -6,15 +6,18 @@ import * as yup from "yup";
 
 import logoBlack from "@/assets/img/logo-black.png";
 import logoWhite from "@/assets/img/logo-white.png";
+import { pushAlert } from "@/components/ui/alert-banner/alert-bus";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
 import { registerUser } from "@/services/auth";
-import { getCurrentTheme } from "@/utils/theme";
+import { registerSchema } from "./schema";
 
 interface FormErrors {
   fullName?: string;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 }
 
 function RegisterPage() {
@@ -23,22 +26,12 @@ function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const schema = yup.object({
-    fullName: yup.string().required(t("auth.fullNameRequired")),
-    email: yup
-      .string()
-      .required(t("auth.emailRequired"))
-      .email(t("auth.emailInvalid")),
-    password: yup
-      .string()
-      .required(t("auth.passwordRequired"))
-      .min(6, t("auth.passwordMin")),
-  });
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -47,8 +40,8 @@ function RegisterPage() {
       setErrors({});
 
       try {
-        await schema.validate(
-          { fullName, email, password },
+        await registerSchema.validate(
+          { fullName, email, password, confirmPassword },
           { abortEarly: false },
         );
       } catch (err) {
@@ -56,7 +49,8 @@ function RegisterPage() {
           const fieldErrors: FormErrors = {};
           for (const inner of err.inner) {
             if (inner.path && !fieldErrors[inner.path as keyof FormErrors]) {
-              fieldErrors[inner.path as keyof FormErrors] = inner.message;
+              const key = inner.message;
+              fieldErrors[inner.path as keyof FormErrors] = t(key);
             }
           }
           setErrors(fieldErrors);
@@ -67,22 +61,35 @@ function RegisterPage() {
       setLoading(true);
       try {
         await registerUser(fullName, email, password);
-        navigate("/login", { replace: true });
+        pushAlert({
+          variant: "success",
+          title: t("auth.registerSuccessTitle"),
+          message: t("auth.registerSuccess"),
+        });
+        setTimeout(() => navigate("/login", { replace: true }), 600);
       } catch (err: unknown) {
         const axiosErr = err as { response?: { status?: number } };
         if (axiosErr.response?.status === 409) {
           setApiError(t("auth.emailExists"));
+          pushAlert({
+            variant: "error",
+            title: t("auth.genericError"),
+            message: t("auth.emailExists"),
+          });
         } else {
           setApiError(t("auth.genericError"));
+          pushAlert({
+            variant: "error",
+            title: t("auth.genericError"),
+            message: t("auth.genericError"),
+          });
         }
       } finally {
         setLoading(false);
       }
     },
-    [fullName, email, password, schema, navigate, t],
+    [fullName, email, password, confirmPassword, navigate, t],
   );
-
-  const isDark = getCurrentTheme() === "dark";
 
   return (
     <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-background px-6">
@@ -91,9 +98,15 @@ function RegisterPage() {
 
       <div className="flex w-full max-w-sm flex-col items-center">
         <img
-          src={isDark ? logoWhite : logoBlack}
-          alt="BrainBox AI"
-          className="mb-4 h-16 w-auto"
+          src={logoBlack}
+          alt="BrainBox logo"
+          className="block h-20 w-auto dark:hidden"
+        />
+        <img
+          src={logoWhite}
+          alt=""
+          aria-hidden="true"
+          className="hidden h-20 w-auto dark:block"
         />
         <h1 className="mb-1 text-2xl font-bold text-foreground">
           {t("auth.registerTitle")}
@@ -102,15 +115,18 @@ function RegisterPage() {
           {t("auth.registerSubtitle")}
         </p>
 
-        {apiError && (
-          <div className="mb-4 w-full rounded-xl bg-destructive/10 px-4 py-3 text-center text-sm font-medium text-destructive">
-            {apiError}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex w-full flex-col gap-4"
+        >
           <div>
-            <div className="flex h-12 items-center rounded-xl border border-border bg-secondary px-4">
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.fullName ? "border-destructive" : "border-border",
+              )}
+            >
               <input
                 type="text"
                 placeholder={t("auth.fullName")}
@@ -118,15 +134,29 @@ function RegisterPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 autoComplete="name"
+                aria-invalid={Boolean(errors.fullName)}
+                aria-describedby={
+                  errors.fullName ? "register-fullname-error" : undefined
+                }
               />
             </div>
             {errors.fullName && (
-              <p className="mt-1 text-xs text-destructive">{errors.fullName}</p>
+              <p
+                id="register-fullname-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.fullName}
+              </p>
             )}
           </div>
 
           <div>
-            <div className="flex h-12 items-center rounded-xl border border-border bg-secondary px-4">
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.email ? "border-destructive" : "border-border",
+              )}
+            >
               <input
                 type="email"
                 placeholder={t("auth.email")}
@@ -134,15 +164,29 @@ function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={
+                  errors.email ? "register-email-error" : undefined
+                }
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-xs text-destructive">{errors.email}</p>
+              <p
+                id="register-email-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.email}
+              </p>
             )}
           </div>
 
           <div>
-            <div className="flex h-12 items-center rounded-xl border border-border bg-secondary px-4">
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.password ? "border-destructive" : "border-border",
+              )}
+            >
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder={t("auth.password")}
@@ -150,6 +194,10 @@ function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 autoComplete="new-password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? "register-password-error" : undefined
+                }
               />
               <button
                 type="button"
@@ -165,7 +213,56 @@ function RegisterPage() {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-destructive">{errors.password}</p>
+              <p
+                id="register-password-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.password}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.confirmPassword ? "border-destructive" : "border-border",
+              )}
+            >
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder={t("auth.confirmPassword")}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                autoComplete="new-password"
+                aria-invalid={Boolean(errors.confirmPassword)}
+                aria-describedby={
+                  errors.confirmPassword ? "register-confirm-error" : undefined
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((p) => !p)}
+                className="ml-2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? (
+                  <EyeSlash size={20} weight="bold" />
+                ) : (
+                  <Eye size={20} weight="bold" />
+                )}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p
+                id="register-confirm-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
 

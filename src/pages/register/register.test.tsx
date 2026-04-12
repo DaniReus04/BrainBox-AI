@@ -38,6 +38,9 @@ describe("RegisterPage", () => {
       expect(screen.getByText("Full name is required")).toBeInTheDocument();
       expect(screen.getByText("Email is required")).toBeInTheDocument();
       expect(screen.getByText("Password is required")).toBeInTheDocument();
+      expect(
+        screen.getByText("Confirm password is required"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -55,14 +58,17 @@ describe("RegisterPage", () => {
       target: { value: "john@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "123456" },
+      target: { value: "Abcd!1234" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Confirm Password"), {
+      target: { value: "Abcd!1234" },
     });
     fireEvent.click(screen.getByText("Sign Up"));
     await waitFor(() =>
       expect(mockRegisterUser).toHaveBeenCalledWith(
         "John",
         "john@test.com",
-        "123456",
+        "Abcd!1234",
       ),
     );
   });
@@ -77,7 +83,10 @@ describe("RegisterPage", () => {
       target: { value: "john@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "123456" },
+      target: { value: "Abcd!1234" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Confirm Password"), {
+      target: { value: "Abcd!1234" },
     });
     fireEvent.click(screen.getByText("Sign Up"));
     await waitFor(() => {

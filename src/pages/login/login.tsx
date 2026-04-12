@@ -6,11 +6,13 @@ import * as yup from "yup";
 
 import logoBlack from "@/assets/img/logo-black.png";
 import logoWhite from "@/assets/img/logo-white.png";
+import { pushAlert } from "@/components/ui/alert-banner/alert-bus";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
 import { loginUser } from "@/services/auth";
 import { setCookie } from "@/utils/cookies";
-import { getCurrentTheme } from "@/utils/theme";
+import { loginSchema } from "./schema";
 
 const SESSION_COOKIE = "brainbox_session";
 
@@ -26,34 +28,22 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const schema = yup.object({
-    email: yup
-      .string()
-      .required(t("auth.emailRequired"))
-      .email(t("auth.emailInvalid")),
-    password: yup
-      .string()
-      .required(t("auth.passwordRequired"))
-      .min(6, t("auth.passwordMin")),
-  });
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setApiError("");
       setErrors({});
 
       try {
-        await schema.validate({ email, password }, { abortEarly: false });
+        await loginSchema.validate({ email, password }, { abortEarly: false });
       } catch (err) {
         if (err instanceof yup.ValidationError) {
           const fieldErrors: FormErrors = {};
           for (const inner of err.inner) {
             if (inner.path && !fieldErrors[inner.path as keyof FormErrors]) {
-              fieldErrors[inner.path as keyof FormErrors] = inner.message;
+              const key = inner.message;
+              fieldErrors[inner.path as keyof FormErrors] = t(key);
             }
           }
           setErrors(fieldErrors);
@@ -65,26 +55,39 @@ function LoginPage() {
       try {
         const { user, token: _token } = await loginUser(email, password);
         setCookie(SESSION_COOKIE, JSON.stringify(user));
-        if (!user.onboardingDone) {
-          navigate("/onboarding", { replace: true });
-        } else {
-          navigate("/home", { replace: true });
-        }
+        pushAlert({
+          variant: "success",
+          title: t("auth.login"),
+          message: t("auth.loginSuccess"),
+        });
+        setTimeout(() => {
+          if (!user.onboardingDone) {
+            navigate("/onboarding", { replace: true });
+          } else {
+            navigate("/home", { replace: true });
+          }
+        }, 600);
       } catch (err: unknown) {
         const axiosErr = err as { response?: { status?: number } };
         if (axiosErr.response?.status === 401) {
-          setApiError(t("auth.invalidCredentials"));
+          pushAlert({
+            variant: "error",
+            title: t("auth.genericError"),
+            message: t("auth.invalidCredentials"),
+          });
         } else {
-          setApiError(t("auth.genericError"));
+          pushAlert({
+            variant: "error",
+            title: t("auth.genericError"),
+            message: t("auth.genericError"),
+          });
         }
       } finally {
         setLoading(false);
       }
     },
-    [email, password, schema, navigate, t],
+    [email, password, navigate, t],
   );
-
-  const isDark = getCurrentTheme() === "dark";
 
   return (
     <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-background px-6">
@@ -93,9 +96,15 @@ function LoginPage() {
 
       <div className="flex w-full max-w-sm flex-col items-center">
         <img
-          src={isDark ? logoWhite : logoBlack}
-          alt="BrainBox AI"
-          className="mb-4 h-16 w-auto"
+          src={logoBlack}
+          alt="BrainBox logo"
+          className="block h-20 w-auto dark:hidden"
+        />
+        <img
+          src={logoWhite}
+          alt=""
+          aria-hidden="true"
+          className="hidden h-20 w-auto dark:block"
         />
         <h1 className="mb-1 text-2xl font-bold text-foreground">
           {t("auth.welcomeTitle")}
@@ -104,15 +113,18 @@ function LoginPage() {
           {t("auth.welcomeSubtitle")}
         </p>
 
-        {apiError && (
-          <div className="mb-4 w-full rounded-xl bg-destructive/10 px-4 py-3 text-center text-sm font-medium text-destructive">
-            {apiError}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex w-full flex-col gap-4"
+        >
           <div>
-            <div className="flex h-12 items-center rounded-xl border border-border bg-secondary px-4">
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.email ? "border-destructive" : "border-border",
+              )}
+            >
               <input
                 type="email"
                 placeholder={t("auth.email")}
@@ -120,15 +132,29 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={
+                  errors.email ? "login-email-error" : undefined
+                }
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-xs text-destructive">{errors.email}</p>
+              <p
+                id="login-email-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.email}
+              </p>
             )}
           </div>
 
           <div>
-            <div className="flex h-12 items-center rounded-xl border border-border bg-secondary px-4">
+            <div
+              className={cn(
+                "flex h-12 items-center rounded-xl border bg-secondary px-4",
+                errors.password ? "border-destructive" : "border-border",
+              )}
+            >
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder={t("auth.password")}
@@ -136,6 +162,10 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 autoComplete="current-password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? "login-password-error" : undefined
+                }
               />
               <button
                 type="button"
@@ -151,7 +181,12 @@ function LoginPage() {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-destructive">{errors.password}</p>
+              <p
+                id="login-password-error"
+                className="mt-1 text-xs text-destructive"
+              >
+                {errors.password}
+              </p>
             )}
           </div>
 

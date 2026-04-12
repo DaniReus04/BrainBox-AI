@@ -62,11 +62,11 @@ describe("LoginPage", () => {
       target: { value: "test@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "123456" },
+      target: { value: "Abcd!1234" },
     });
     fireEvent.click(screen.getByText("Sign In"));
     await waitFor(() =>
-      expect(mockLoginUser).toHaveBeenCalledWith("test@test.com", "123456"),
+      expect(mockLoginUser).toHaveBeenCalledWith("test@test.com", "Abcd!1234"),
     );
   });
 
@@ -77,7 +77,7 @@ describe("LoginPage", () => {
       target: { value: "test@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "123456" },
+      target: { value: "Abcd!1234" },
     });
     fireEvent.click(screen.getByText("Sign In"));
     await waitFor(() => {
