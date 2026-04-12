@@ -55,7 +55,6 @@ export default defineConfig({
           browser: {
             enabled: true,
             headless: true,
-            // @ts-expect-error -- pnpm hoisting causes duplicate vitest types
             provider: playwright({}),
             instances: [{ browser: "chromium" }],
           },
