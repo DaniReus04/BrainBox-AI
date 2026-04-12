@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AlertHost } from "@/components/ui/alert-banner/alert-bus";
 import { RegisterPage } from "./register";
 
 const mockRegisterUser = vi.fn();
@@ -13,6 +14,7 @@ function renderRegister() {
   return render(
     <MemoryRouter initialEntries={["/register"]}>
       <RegisterPage />
+      <AlertHost />
     </MemoryRouter>,
   );
 }
@@ -47,12 +49,12 @@ describe("RegisterPage", () => {
   it("should call registerUser on valid submit", async () => {
     mockRegisterUser.mockResolvedValueOnce({
       id: "1",
-      fullName: "John",
+      fullName: "John Doe",
       email: "john@test.com",
     });
     renderRegister();
     fireEvent.change(screen.getByPlaceholderText("Full Name"), {
-      target: { value: "John" },
+      target: { value: "John Doe" },
     });
     fireEvent.change(screen.getByPlaceholderText("Email"), {
       target: { value: "john@test.com" },
@@ -66,7 +68,7 @@ describe("RegisterPage", () => {
     fireEvent.click(screen.getByText("Sign Up"));
     await waitFor(() =>
       expect(mockRegisterUser).toHaveBeenCalledWith(
-        "John",
+        "John Doe",
         "john@test.com",
         "Abcd!1234",
       ),
@@ -77,7 +79,7 @@ describe("RegisterPage", () => {
     mockRegisterUser.mockRejectedValueOnce({ response: { status: 409 } });
     renderRegister();
     fireEvent.change(screen.getByPlaceholderText("Full Name"), {
-      target: { value: "John" },
+      target: { value: "John Doe" },
     });
     fireEvent.change(screen.getByPlaceholderText("Email"), {
       target: { value: "john@test.com" },
