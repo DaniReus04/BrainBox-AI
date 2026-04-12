@@ -1,6 +1,11 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import App from "./App";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { HomePage } from "./pages/home";
+import { LoginPage } from "./pages/login";
+import { SplashPage } from "./pages/splash";
+
+const SESSION_COOKIE = "brainbox_session";
 
 vi.mock("@/services/onboarding", () => ({
   saveOnboardingStatus: vi
@@ -8,35 +13,59 @@ vi.mock("@/services/onboarding", () => ({
     .mockResolvedValue({ status: "completed", completedAt: "" }),
 }));
 
+vi.mock("@/services/auth", () => ({
+  loginUser: vi.fn(),
+  registerUser: vi.fn(),
+  markOnboardingDone: vi.fn().mockResolvedValue({ success: true }),
+}));
+
+function renderApp(initialRoute = "/") {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/" element={<SplashPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/home" element={<HomePage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 describe("App", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     // biome-ignore lint/suspicious/noDocumentCookie: test setup requires direct cookie manipulation
-    document.cookie =
-      "brainbox_onboarding_done=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    document.cookie = `${SESSION_COOKIE}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("should render the splash screen initially", () => {
-    render(<App />);
+    renderApp("/");
     expect(screen.getByText("BrainBox")).toBeInTheDocument();
   });
 
-  it("should show onboarding after splash when no cookie", async () => {
-    vi.useFakeTimers();
-    render(<App />);
+  it("should show login after splash when no session", async () => {
+    renderApp("/");
     await act(() => vi.advanceTimersByTime(3000));
     vi.useRealTimers();
     await waitFor(() => {
-      expect(
-        screen.getByText("Unlock the Power Of Future AI"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Welcome Back")).toBeInTheDocument();
     });
   });
 
-  it("should skip onboarding when cookie exists", async () => {
+  it("should go to home when session exists with onboarding done", async () => {
+    const user = JSON.stringify({
+      id: "1",
+      fullName: "Test",
+      email: "t@t.com",
+      onboardingDone: true,
+    });
     // biome-ignore lint/suspicious/noDocumentCookie: test setup requires direct cookie manipulation
-    document.cookie = "brainbox_onboarding_done=completed; path=/";
-    vi.useFakeTimers();
-    render(<App />);
+    document.cookie = `${SESSION_COOKIE}=${encodeURIComponent(user)}; path=/`;
+    renderApp("/");
     await act(() => vi.advanceTimersByTime(3000));
     vi.useRealTimers();
     await waitFor(() => {

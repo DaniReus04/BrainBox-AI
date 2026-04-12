@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import robotImage from "@/assets/img/robot-image-2.jpg";
 import { LanguageToggle } from "@/components/ui/language-toggle";
@@ -9,20 +10,19 @@ import {
 } from "@/components/ui/onboarding-card";
 import { SkipConfirmDialog } from "@/components/ui/skip-confirm-dialog";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import type { AuthUser } from "@/services/auth";
+import { markOnboardingDone } from "@/services/auth";
 import {
   type OnboardingStatus,
   saveOnboardingStatus,
 } from "@/services/onboarding";
-import { setCookie } from "@/utils/cookies";
+import { getCookie, setCookie } from "@/utils/cookies";
 
-const ONBOARDING_COOKIE = "brainbox_onboarding_done";
+const SESSION_COOKIE = "brainbox_session";
 
-interface OnboardingProps {
-  onComplete: () => void;
-}
-
-function Onboarding({ onComplete }: OnboardingProps) {
+function OnboardingPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [showSkipDialog, setShowSkipDialog] = useState(false);
 
@@ -49,15 +49,27 @@ function Onboarding({ onComplete }: OnboardingProps) {
 
   const finishOnboarding = useCallback(
     async (status: OnboardingStatus) => {
-      setCookie(ONBOARDING_COOKIE, status);
       try {
         await saveOnboardingStatus(status);
       } catch {
         /* empty */
       }
-      onComplete();
+
+      const session = getCookie(SESSION_COOKIE);
+      if (session) {
+        try {
+          const user = JSON.parse(session) as AuthUser;
+          const updated = { ...user, onboardingDone: true };
+          setCookie(SESSION_COOKIE, JSON.stringify(updated));
+          markOnboardingDone(user.id).catch(() => {});
+        } catch {
+          /* empty */
+        }
+      }
+
+      navigate("/home", { replace: true });
     },
-    [onComplete],
+    [navigate],
   );
 
   const handleNext = useCallback(() => {
@@ -114,4 +126,4 @@ function Onboarding({ onComplete }: OnboardingProps) {
   );
 }
 
-export { ONBOARDING_COOKIE, Onboarding };
+export { OnboardingPage };
