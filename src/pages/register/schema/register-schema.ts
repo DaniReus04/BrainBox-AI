@@ -16,5 +16,5 @@ export const registerSchema = yup.object({
   confirmPassword: yup
     .string()
     .required("auth.confirmPasswordRequired")
-    .oneOf([yup.ref("password"), null], "auth.confirmPasswordMatch"),
+    .oneOf([yup.ref("password")], "auth.confirmPasswordMatch"),
 });
