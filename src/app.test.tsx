@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { AuthProvider } from "./context/auth-context";
 import { HomePage } from "./pages/home";
 import { LoginPage } from "./pages/login";
 import { SplashPage } from "./pages/splash";
@@ -21,13 +22,15 @@ vi.mock("@/services/auth", () => ({
 
 function renderApp(initialRoute = "/") {
   return render(
-    <MemoryRouter initialEntries={[initialRoute]}>
-      <Routes>
-        <Route path="/" element={<SplashPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
-      </Routes>
-    </MemoryRouter>,
+    <AuthProvider>
+      <MemoryRouter initialEntries={[initialRoute]}>
+        <Routes>
+          <Route path="/" element={<SplashPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/home" element={<HomePage />} />
+        </Routes>
+      </MemoryRouter>
+    </AuthProvider>,
   );
 }
 

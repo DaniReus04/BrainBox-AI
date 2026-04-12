@@ -10,18 +10,18 @@ import {
 } from "@/components/ui/onboarding-card";
 import { SkipConfirmDialog } from "@/components/ui/skip-confirm-dialog";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useAuth } from "@/context/auth-context";
 import type { AuthUser } from "@/services/auth";
 import { markOnboardingDone } from "@/services/auth";
 import {
   type OnboardingStatus,
   saveOnboardingStatus,
 } from "@/services/onboarding";
-import { getCookie, setCookie } from "@/utils/cookies";
-
-const SESSION_COOKIE = "brainbox_session";
+import { getCookie } from "@/utils/cookies";
 
 function OnboardingPage() {
   const { t } = useTranslation();
+  const { setUser } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [showSkipDialog, setShowSkipDialog] = useState(false);
@@ -55,12 +55,12 @@ function OnboardingPage() {
         /* empty */
       }
 
-      const session = getCookie(SESSION_COOKIE);
+      const session = getCookie("brainbox_session");
       if (session) {
         try {
           const user = JSON.parse(session) as AuthUser;
           const updated = { ...user, onboardingDone: true };
-          setCookie(SESSION_COOKIE, JSON.stringify(updated));
+          setUser(updated);
           markOnboardingDone(user.id).catch(() => {});
         } catch {
           /* empty */
@@ -69,7 +69,7 @@ function OnboardingPage() {
 
       navigate("/home", { replace: true });
     },
-    [navigate],
+    [navigate, setUser],
   );
 
   const handleNext = useCallback(() => {

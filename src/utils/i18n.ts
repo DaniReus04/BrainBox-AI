@@ -6,7 +6,12 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    lng: "en",
     fallbackLng: "en",
+    detection: {
+      order: ["querystring", "cookie", "localStorage", "navigator"],
+      caches: ["localStorage", "cookie"],
+    },
     interpolation: {
       escapeValue: false,
     },

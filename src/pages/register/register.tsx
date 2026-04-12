@@ -30,13 +30,11 @@ function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setApiError("");
       setErrors({});
 
       try {
@@ -70,14 +68,12 @@ function RegisterPage() {
       } catch (err: unknown) {
         const axiosErr = err as { response?: { status?: number } };
         if (axiosErr.response?.status === 409) {
-          setApiError(t("auth.emailExists"));
           pushAlert({
             variant: "error",
             title: t("auth.genericError"),
             message: t("auth.emailExists"),
           });
         } else {
-          setApiError(t("auth.genericError"));
           pushAlert({
             variant: "error",
             title: t("auth.genericError"),

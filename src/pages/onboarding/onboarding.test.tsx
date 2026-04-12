@@ -1,6 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { AlertHost } from "@/components/ui/alert-banner/alert-bus";
+import { AuthProvider } from "@/context/auth-context";
 import { OnboardingPage } from "./onboarding";
 
 vi.mock("@/services/onboarding", () => ({
@@ -15,9 +17,12 @@ vi.mock("@/services/auth", () => ({
 
 function renderOnboarding() {
   return render(
-    <MemoryRouter initialEntries={["/onboarding"]}>
-      <OnboardingPage />
-    </MemoryRouter>,
+    <AuthProvider>
+      <MemoryRouter initialEntries={["/onboarding"]}>
+        <OnboardingPage />
+        <AlertHost />
+      </MemoryRouter>
+    </AuthProvider>,
   );
 }
 

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AlertHost } from "@/components/ui/alert-banner/alert-bus";
+import { AuthProvider } from "@/context/auth-context";
 import { LoginPage } from "./login";
 
 const mockLoginUser = vi.fn();
@@ -13,8 +14,10 @@ vi.mock("@/services/auth", () => ({
 function renderLogin() {
   return render(
     <MemoryRouter initialEntries={["/login"]}>
-      <LoginPage />
-      <AlertHost />
+      <AuthProvider>
+        <LoginPage />
+        <AlertHost />
+      </AuthProvider>
     </MemoryRouter>,
   );
 }

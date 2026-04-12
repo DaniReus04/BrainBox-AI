@@ -2,10 +2,8 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { Loading } from "@/components/ui/loading";
-
-const SplashPage = lazy(() =>
-  import("@/pages/splash").then((m) => ({ default: m.SplashPage })),
-);
+import { WithAuth } from "@/hoc/with-auth";
+import { WithoutAuth } from "@/hoc/without-auth";
 
 const LoginPage = lazy(() =>
   import("@/pages/login").then((m) => ({ default: m.LoginPage })),
@@ -13,6 +11,10 @@ const LoginPage = lazy(() =>
 
 const RegisterPage = lazy(() =>
   import("@/pages/register").then((m) => ({ default: m.RegisterPage })),
+);
+
+const SplashPage = lazy(() =>
+  import("@/pages/splash").then((m) => ({ default: m.SplashPage })),
 );
 
 const OnboardingPage = lazy(() =>
@@ -40,7 +42,9 @@ export const router = createBrowserRouter([
     path: "/login",
     element: (
       <SuspenseWrapper>
-        <LoginPage />
+        <WithoutAuth>
+          <LoginPage />
+        </WithoutAuth>
       </SuspenseWrapper>
     ),
   },
@@ -48,7 +52,9 @@ export const router = createBrowserRouter([
     path: "/register",
     element: (
       <SuspenseWrapper>
-        <RegisterPage />
+        <WithoutAuth>
+          <RegisterPage />
+        </WithoutAuth>
       </SuspenseWrapper>
     ),
   },
@@ -56,7 +62,9 @@ export const router = createBrowserRouter([
     path: "/onboarding",
     element: (
       <SuspenseWrapper>
-        <OnboardingPage />
+        <WithAuth>
+          <OnboardingPage />
+        </WithAuth>
       </SuspenseWrapper>
     ),
   },
@@ -64,7 +72,9 @@ export const router = createBrowserRouter([
     path: "/home",
     element: (
       <SuspenseWrapper>
-        <HomePage />
+        <WithAuth>
+          <HomePage />
+        </WithAuth>
       </SuspenseWrapper>
     ),
   },

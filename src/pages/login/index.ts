@@ -1,1 +1,1 @@
-export { LoginPage, SESSION_COOKIE } from "./login";
+export { LoginPage } from "./login";

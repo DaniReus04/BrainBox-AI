@@ -9,12 +9,10 @@ import logoWhite from "@/assets/img/logo-white.png";
 import { pushAlert } from "@/components/ui/alert-banner/alert-bus";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { loginUser } from "@/services/auth";
-import { setCookie } from "@/utils/cookies";
 import { loginSchema } from "./schema";
-
-const SESSION_COOKIE = "brainbox_session";
 
 interface FormErrors {
   email?: string;
@@ -24,6 +22,7 @@ interface FormErrors {
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +53,7 @@ function LoginPage() {
       setLoading(true);
       try {
         const { user, token: _token } = await loginUser(email, password);
-        setCookie(SESSION_COOKIE, JSON.stringify(user));
+        setUser(user);
         pushAlert({
           variant: "success",
           title: t("auth.login"),
@@ -86,7 +85,7 @@ function LoginPage() {
         setLoading(false);
       }
     },
-    [email, password, navigate, t],
+    [email, password, navigate, setUser, t],
   );
 
   return (
@@ -214,4 +213,4 @@ function LoginPage() {
   );
 }
 
-export { LoginPage, SESSION_COOKIE };
+export { LoginPage };
