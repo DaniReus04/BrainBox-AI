@@ -102,7 +102,7 @@ function OnboardingPage() {
   return (
     <div className="flex min-h-dvh w-full items-center justify-center bg-background">
       <ThemeToggle />
-      <LanguageToggle />
+      <LanguageToggle className="fixed left-16 top-5 md:left-20 md:top-8" />
 
       <OnboardingCard
         steps={steps}

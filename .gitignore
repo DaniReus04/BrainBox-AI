@@ -23,6 +23,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+.env
 
 *storybook.log
 storybook-static

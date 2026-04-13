@@ -57,10 +57,7 @@ function LanguageToggle({
   const label = SHORT[i18n.language] ?? "EN";
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("fixed left-16 top-5 z-30 md:left-20 md:top-8", className)}
-    >
+    <div ref={containerRef} className={cn("relative z-30", className)}>
       <button
         type="button"
         onClick={toggle}

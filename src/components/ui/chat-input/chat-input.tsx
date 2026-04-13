@@ -58,7 +58,7 @@ function ChatInput({
         onClick={() => value.trim() && onSubmit?.(value)}
         disabled={disabled || !value.trim()}
         aria-label={resolvedSendLabel}
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-foreground text-background transition-opacity disabled:opacity-50"
+        className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-[12px] bg-foreground text-background transition-opacity disabled:opacity-50"
       >
         <PaperPlaneRight size={18} weight="fill" />
       </button>

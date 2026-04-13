@@ -71,7 +71,7 @@ function RecentChatsSection({
           <button
             type="button"
             onClick={onToggle}
-            className="text-xs font-medium text-foreground/70 transition-colors hover:text-foreground"
+            className="text-xs font-medium text-foreground/70 transition-colors hover:text-foreground cursor-pointer"
           >
             {expanded ? t("home.seeLess") : t("home.seeAll")}
           </button>
@@ -84,7 +84,7 @@ function RecentChatsSection({
             key={chat.id}
             type="button"
             onClick={() => onOpenChat(chat.id)}
-            className="flex w-full items-start gap-3 rounded-[18px] bg-background/80 px-4 py-4 text-left transition-colors hover:bg-secondary"
+            className="flex w-full cursor-pointer items-start gap-3 rounded-[18px] bg-background/80 px-4 py-4 text-left transition-colors hover:bg-secondary"
           >
             <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-secondary text-foreground">
               <ChatCircleDots size={18} weight="fill" />
@@ -129,6 +129,7 @@ function HomePage() {
       label: t("home.navActivity"),
       icon: ClockCounterClockwise,
       active: false,
+      onClick: () => navigate("/activity"),
     },
     {
       key: "profile",
@@ -154,7 +155,6 @@ function HomePage() {
           <div className="flex items-center gap-2">
             <ThemeToggle className="static left-auto top-auto size-10 rounded-[12px] hover:text-foreground" />
             <LanguageToggle
-              className="static left-auto top-auto"
               buttonClassName="size-10 rounded-[12px] text-[11px] font-semibold tracking-[0.12em]"
               menuClassName="right-0 left-auto"
             />
@@ -164,7 +164,7 @@ function HomePage() {
 
       <div className="flex-1 overflow-y-auto pb-28">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 sm:px-6">
-          <section className="rounded-[28px] bg-[linear-gradient(180deg,_var(--color-card)_0%,_color-mix(in_srgb,var(--color-card)_88%,var(--color-secondary))_100%)] p-6 shadow-[0_16px_44px_rgba(0,0,0,0.05)] dark:shadow-[0_18px_44px_rgba(0,0,0,0.24)]">
+          <section className="rounded-[28px] bg-[linear-gradient(180deg,var(--color-card)_0%,color-mix(in_srgb,var(--color-card)_88%,var(--color-secondary))_100%)] p-6 shadow-[0_16px_44px_rgba(0,0,0,0.05)] dark:shadow-[0_18px_44px_rgba(0,0,0,0.24)]">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               {t("home.heroEyebrow")}
             </p>
@@ -178,7 +178,7 @@ function HomePage() {
             <Button
               type="button"
               onClick={() => navigate("/chat/new")}
-              className="mt-7 h-12 rounded-[16px] bg-foreground px-5 text-sm font-semibold text-background hover:bg-foreground/90"
+              className="mt-7 h-12 rounded-[16px] bg-foreground px-5 text-sm font-semibold text-background hover:bg-foreground/90 cursor-pointer"
             >
               <PaperPlaneTilt size={18} weight="fill" />
               {t("home.primaryAction")}
@@ -216,7 +216,7 @@ function HomePage() {
               aria-current={active ? "page" : undefined}
               aria-label={label}
               className={cn(
-                "flex min-w-16 flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[11px] transition-colors",
+                "flex min-w-16 flex-col items-center gap-1 rounded-xl px-2 py-1.5 text-[11px] transition-colors cursor-pointer",
                 active
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",

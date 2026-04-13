@@ -76,6 +76,18 @@ const resources = {
         navActivity: "Activity",
         navProfile: "Profile",
       },
+      activity: {
+        headerTitle: "Activity",
+        emptyTitle: "No conversations yet",
+        emptyDescription:
+          "Your chat history will appear here once you start a conversation.",
+        listTitle: "Chat History",
+        deleteLabel: "Delete chat",
+        deleteDialogTitle: "Delete chat?",
+        deleteConfirm: "Are you sure you want to delete this chat?",
+        deleteCancel: "Cancel",
+        deleteConfirmAction: "Delete",
+      },
       chat: {
         headerEyebrow: "New chat",
         headerTitle: "",
@@ -183,6 +195,18 @@ const resources = {
         navChats: "Chat",
         navActivity: "Atividade",
         navProfile: "Perfil",
+      },
+      activity: {
+        headerTitle: "Atividade",
+        emptyTitle: "Nenhuma conversa ainda",
+        emptyDescription:
+          "Seu histórico de chats aparecerá aqui assim que você iniciar uma conversa.",
+        listTitle: "Histórico de Chats",
+        deleteLabel: "Excluir chat",
+        deleteDialogTitle: "Excluir chat?",
+        deleteConfirm: "Tem certeza que deseja excluir este chat?",
+        deleteCancel: "Cancelar",
+        deleteConfirmAction: "Excluir",
       },
       chat: {
         headerEyebrow: "Novo chat",
@@ -293,6 +317,18 @@ const resources = {
         navChats: "Chat",
         navActivity: "Actividad",
         navProfile: "Perfil",
+      },
+      activity: {
+        headerTitle: "Actividad",
+        emptyTitle: "Sin conversaciones aún",
+        emptyDescription:
+          "Tu historial de chats aparecerá aquí una vez que inicies una conversación.",
+        listTitle: "Historial de Chats",
+        deleteLabel: "Eliminar chat",
+        deleteDialogTitle: "¿Eliminar chat?",
+        deleteConfirm: "¿Seguro que quieres eliminar este chat?",
+        deleteCancel: "Cancelar",
+        deleteConfirmAction: "Eliminar",
       },
       chat: {
         headerEyebrow: "Nuevo chat",

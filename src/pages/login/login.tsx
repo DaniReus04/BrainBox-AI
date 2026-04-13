@@ -91,7 +91,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-dvh w-full flex-col items-center justify-center bg-background px-6">
       <ThemeToggle />
-      <LanguageToggle />
+      <LanguageToggle className="fixed left-16 top-5 md:left-20 md:top-8" />
 
       <div className="flex w-full max-w-sm flex-col items-center">
         <img

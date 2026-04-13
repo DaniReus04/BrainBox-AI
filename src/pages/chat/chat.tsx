@@ -1,9 +1,11 @@
 import {
   ArrowClockwise,
   CaretLeft,
+  Check,
   Copy,
-  ShareNetwork,
+  DownloadSimple,
 } from "@phosphor-icons/react";
+import { jsPDF } from "jspdf";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -39,6 +41,7 @@ function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
   const emptyStateItems = [
@@ -49,6 +52,9 @@ function ChatPage() {
     t("chat.infoFive"),
   ];
 
+  const messageCount = messages.length;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll must re-run when message count or loading state changes
   useEffect(() => {
     if (!scrollAreaRef.current) return;
 
@@ -56,7 +62,7 @@ function ChatPage() {
       top: scrollAreaRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, []);
+  }, [messageCount, isLoading]);
 
   useEffect(() => {
     if (!requestedThreadId) {
@@ -184,8 +190,6 @@ function ChatPage() {
     navigate("/home");
   };
 
-  const isDark = document.documentElement.classList.contains("dark");
-
   return (
     <main className="flex h-screen w-full flex-col bg-background text-foreground">
       <section className="flex min-h-0 w-full flex-1 flex-col bg-background">
@@ -195,7 +199,7 @@ function ChatPage() {
               <button
                 type="button"
                 onClick={() => navigate("/home")}
-                className="inline-flex size-10 items-center justify-center rounded-[12px] bg-secondary text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
+                className="inline-flex size-10 items-center justify-center rounded-[12px] bg-secondary text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer"
                 aria-label={t("chat.backToHome")}
               >
                 <CaretLeft size={18} weight="bold" />
@@ -204,13 +208,10 @@ function ChatPage() {
 
             <div className="flex items-center justify-end gap-2">
               <ThemeToggle className="static left-auto top-auto size-10 rounded-[12px] hover:text-foreground" />
-              <div className="relative">
-                <LanguageToggle
-                  className="static left-auto top-auto z-20"
-                  buttonClassName="size-10 rounded-[12px] text-[11px] font-semibold tracking-[0.12em]"
-                  menuClassName="right-0 left-auto"
-                />
-              </div>
+              <LanguageToggle
+                buttonClassName="size-10 rounded-[12px] text-[11px] font-semibold tracking-[0.12em]"
+                menuClassName="right-0 left-auto"
+              />
               <ChatActionsMenu
                 messages={messages}
                 onDelete={handleDeleteChat}
@@ -223,12 +224,10 @@ function ChatPage() {
         <div
           ref={scrollAreaRef}
           className={cn(
-            "flex-1 overflow-y-auto",
+            "flex-1 overflow-y-auto custom-scrollbar",
             messages.length === 0
               ? "bg-background"
-              : isDark
-                ? "bg-[#171a1b]"
-                : "bg-white",
+              : "bg-white dark:bg-[#171a1b]",
           )}
         >
           <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col">
@@ -261,56 +260,90 @@ function ChatPage() {
                       key={`${message.role}-${message.content.slice(0, 20)}`}
                       className={cn(
                         "border-b border-black/4 dark:border-white/4",
-                        isDark
-                          ? isUser
-                            ? "bg-[#171a1b]"
-                            : "bg-[#26292a]"
-                          : isUser
-                            ? "bg-[#ffffff]"
-                            : "bg-[#f6f6f6]",
+                        isUser
+                          ? "bg-[#ffffff] dark:bg-[#171a1b]"
+                          : "bg-[#f6f6f6] dark:bg-[#26292a]",
                       )}
                     >
                       <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 lg:px-10">
                         <div className="flex items-center gap-3">
                           <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-[7px] bg-secondary">
-                            <img
-                              src={
-                                isUser
-                                  ? robotImage
-                                  : isDark
-                                    ? logoWhite
-                                    : logoBlack
-                              }
-                              alt=""
-                              aria-hidden="true"
-                              className={cn(
-                                "object-cover",
-                                isUser ? "size-7" : "h-4 w-auto",
-                              )}
-                            />
+                            {isUser ? (
+                              <img
+                                src={robotImage}
+                                alt=""
+                                aria-hidden="true"
+                                className="size-7 object-cover"
+                              />
+                            ) : (
+                              <>
+                                <img
+                                  src={logoBlack}
+                                  alt=""
+                                  aria-hidden="true"
+                                  className="h-4 w-auto object-cover dark:hidden"
+                                />
+                                <img
+                                  src={logoWhite}
+                                  alt=""
+                                  aria-hidden="true"
+                                  className="hidden h-4 w-auto object-cover dark:block"
+                                />
+                              </>
+                            )}
                           </div>
 
                           <p className="min-w-0 flex-1 truncate text-[10px] font-medium">
                             {message.content}
                           </p>
-
-                          <button
-                            type="button"
-                            className="text-muted-foreground"
-                            aria-label="Copy message"
-                          >
-                            <Copy size={14} />
-                          </button>
                         </div>
 
                         {!isUser && (
                           <>
                             <div className="mt-2 flex justify-end gap-3 text-muted-foreground">
-                              <button type="button" aria-label="Copy answer">
-                                <Copy size={14} />
+                              <button
+                                type="button"
+                                aria-label="Copy answer"
+                                className="cursor-pointer transition-colors hover:text-foreground"
+                                onClick={() => {
+                                  const idx = messages.indexOf(message);
+                                  navigator.clipboard.writeText(
+                                    message.content,
+                                  );
+                                  setCopiedIndex(idx);
+                                  setTimeout(() => setCopiedIndex(null), 2000);
+                                }}
+                              >
+                                {copiedIndex === messages.indexOf(message) ? (
+                                  <Check size={14} className="text-green-500" />
+                                ) : (
+                                  <Copy size={14} />
+                                )}
                               </button>
-                              <button type="button" aria-label="Share answer">
-                                <ShareNetwork size={14} />
+                              <button
+                                type="button"
+                                aria-label="Download answer as PDF"
+                                className="cursor-pointer transition-colors hover:text-foreground"
+                                onClick={() => {
+                                  const doc = new jsPDF({
+                                    unit: "pt",
+                                    format: "a4",
+                                  });
+                                  const margin = 48;
+                                  const usable =
+                                    doc.internal.pageSize.getWidth() -
+                                    margin * 2;
+                                  doc.setFont("helvetica", "normal");
+                                  doc.setFontSize(11);
+                                  const lines = doc.splitTextToSize(
+                                    message.content,
+                                    usable,
+                                  );
+                                  doc.text(lines, margin, margin);
+                                  doc.save("brainbox-answer.pdf");
+                                }}
+                              >
+                                <DownloadSimple size={14} />
                               </button>
                             </div>
 
@@ -325,7 +358,7 @@ function ChatPage() {
                 })}
 
                 {isLoading && (
-                  <div className={cn(isDark ? "bg-[#26292a]" : "bg-[#f6f6f6]")}>
+                  <div className="bg-[#f6f6f6] dark:bg-[#26292a]">
                     <div className="mx-auto w-full max-w-5xl px-4 py-5 text-[11px] leading-[1.9] text-foreground/78 sm:px-6 lg:px-10">
                       {t("chat.thinking")}
                     </div>
@@ -351,7 +384,7 @@ function ChatPage() {
                   variant="outline"
                   onClick={handleRegenerate}
                   disabled={isLoading}
-                  className="h-[38px] rounded-[10px] border-border bg-transparent px-4 text-[11px] font-normal text-muted-foreground hover:bg-secondary"
+                  className="h-[38px] rounded-[10px] border-border bg-transparent px-4 text-[11px] font-normal text-muted-foreground hover:bg-secondary cursor-pointer"
                 >
                   <ArrowClockwise size={13} />
                   {t("chat.regenerate")}
