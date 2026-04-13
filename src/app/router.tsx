@@ -25,6 +25,10 @@ const HomePage = lazy(() =>
   import("@/pages/home").then((m) => ({ default: m.HomePage })),
 );
 
+const ChatPage = lazy(() =>
+  import("@/pages/chat").then((m) => ({ default: m.ChatPage })),
+);
+
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<Loading />}>{children}</Suspense>;
 }
@@ -74,6 +78,16 @@ export const router = createBrowserRouter([
       <SuspenseWrapper>
         <WithAuth>
           <HomePage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/chat/new",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <ChatPage />
         </WithAuth>
       </SuspenseWrapper>
     ),

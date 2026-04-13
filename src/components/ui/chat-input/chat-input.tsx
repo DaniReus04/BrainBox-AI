@@ -1,5 +1,6 @@
 import { PaperPlaneRight } from "@phosphor-icons/react";
 import type * as React from "react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
@@ -10,17 +11,23 @@ interface ChatInputProps
   onSubmit?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  sendLabel?: string;
 }
 
 function ChatInput({
   value = "",
   onChange,
   onSubmit,
-  placeholder = "Send a message...",
+  placeholder,
   disabled = false,
+  sendLabel,
   className,
   ...props
 }: ChatInputProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("chat.inputPlaceholder");
+  const resolvedSendLabel = sendLabel ?? t("chat.sendMessage");
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey && value.trim()) {
       e.preventDefault();
@@ -32,28 +39,26 @@ function ChatInput({
     <div
       data-slot="chat-input"
       className={cn(
-        "flex items-center gap-3 border-t border-border bg-background px-4 py-3",
+        "flex items-center rounded-[10px] border border-border bg-secondary px-3 py-2",
         className,
       )}
       {...props}
     >
-      <div className="flex flex-1 items-center rounded-full bg-secondary px-4 py-2.5">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-        />
-      </div>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={resolvedPlaceholder}
+        disabled={disabled}
+        className="w-full bg-transparent px-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+      />
       <button
         type="button"
         onClick={() => value.trim() && onSubmit?.(value)}
         disabled={disabled || !value.trim()}
-        aria-label="Send message"
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-50"
+        aria-label={resolvedSendLabel}
+        className="inline-flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-foreground text-background transition-opacity disabled:opacity-50"
       >
         <PaperPlaneRight size={18} weight="fill" />
       </button>

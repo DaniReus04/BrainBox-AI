@@ -17,9 +17,15 @@ const SHORT: Record<string, string> = {
 
 interface LanguageToggleProps {
   className?: string;
+  menuClassName?: string;
+  buttonClassName?: string;
 }
 
-function LanguageToggle({ className }: LanguageToggleProps) {
+function LanguageToggle({
+  className,
+  menuClassName,
+  buttonClassName,
+}: LanguageToggleProps) {
   const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,13 +66,21 @@ function LanguageToggle({ className }: LanguageToggleProps) {
         onClick={toggle}
         aria-label={`Change language, current: ${label}`}
         aria-expanded={open}
-        className="flex size-9 cursor-pointer items-center justify-center rounded-full text-xs font-bold text-muted-foreground transition-colors hover:text-foreground"
+        className={cn(
+          "flex size-9 cursor-pointer items-center justify-center rounded-full text-xs font-bold text-muted-foreground transition-colors hover:text-foreground",
+          buttonClassName,
+        )}
       >
         {label}
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full mt-1 min-w-[120px] animate-in fade-in slide-in-from-top-1 duration-150 rounded-xl border border-border bg-card p-1 shadow-lg">
+        <div
+          className={cn(
+            "absolute left-0 top-full mt-1 min-w-[120px] animate-in fade-in slide-in-from-top-1 duration-150 rounded-xl border border-border bg-card p-1 shadow-lg",
+            menuClassName,
+          )}
+        >
           {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
