@@ -33,6 +33,32 @@ const ActivityPage = lazy(() =>
   import("@/pages/activity").then((m) => ({ default: m.ActivityPage })),
 );
 
+const ProfilePage = lazy(() =>
+  import("@/pages/profile").then((m) => ({ default: m.ProfilePage })),
+);
+
+const PreferencesPage = lazy(() =>
+  import("@/pages/preferences").then((m) => ({ default: m.PreferencesPage })),
+);
+
+const EditInformationPage = lazy(() =>
+  import("@/pages/edit-information").then((m) => ({
+    default: m.EditInformationPage,
+  })),
+);
+
+const ChangePasswordPage = lazy(() =>
+  import("@/pages/change-password").then((m) => ({
+    default: m.ChangePasswordPage,
+  })),
+);
+
+const InviteFriendPage = lazy(() =>
+  import("@/pages/invite-friend").then((m) => ({
+    default: m.InviteFriendPage,
+  })),
+);
+
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<Loading />}>{children}</Suspense>;
 }
@@ -92,6 +118,56 @@ export const router = createBrowserRouter([
       <SuspenseWrapper>
         <WithAuth>
           <ActivityPage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <ProfilePage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/preferences",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <PreferencesPage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/edit-information",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <EditInformationPage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/change-password",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <ChangePasswordPage />
+        </WithAuth>
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "/invite-friend",
+    element: (
+      <SuspenseWrapper>
+        <WithAuth>
+          <InviteFriendPage />
         </WithAuth>
       </SuspenseWrapper>
     ),

@@ -70,6 +70,7 @@ function ActivityPage() {
         label: t("home.navProfile"),
         icon: UserCircle,
         active: false,
+        onClick: () => navigate("/profile"),
       },
     ],
     [t, navigate],

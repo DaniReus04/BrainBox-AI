@@ -9,8 +9,8 @@ const alertBannerVariants = cva(
     variants: {
       variant: {
         success:
-          "border-green-500/50 bg-green-500/10 text-green-800 dark:text-green-100",
-        error: "border-destructive/50 bg-destructive/10 text-destructive",
+          "border-green-600 bg-green-500 text-green-800 dark:text-green-100",
+        error: "border-red-800 bg-red-500 text-red-800 dark:text-red-100",
       },
     },
     defaultVariants: {

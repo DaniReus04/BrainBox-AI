@@ -37,3 +37,22 @@ export async function markOnboardingDone(userId: string) {
   const { data } = await api.post("/api/auth/onboarding-done", { userId });
   return data;
 }
+
+interface ChangePasswordPayload {
+  readonly userId: string;
+  readonly currentPassword: string;
+  readonly newPassword: string;
+}
+
+export async function changePasswordUser({
+  userId,
+  currentPassword,
+  newPassword,
+}: ChangePasswordPayload) {
+  const { data } = await api.post("/api/auth/change-password", {
+    userId,
+    currentPassword,
+    newPassword,
+  });
+  return data;
+}

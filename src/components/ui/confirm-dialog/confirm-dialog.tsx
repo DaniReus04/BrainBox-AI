@@ -19,7 +19,7 @@ function ConfirmDialogOverlay({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button
       type="button"
-      className="fixed inset-0 z-40 cursor-pointer bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-40 cursor-pointer bg-black/50 backdrop-blur-sm cursor-pointer"
       onClick={onDismiss}
       aria-label="Close dialog"
       tabIndex={-1}
@@ -78,7 +78,7 @@ function ConfirmDialog({
           <Button
             type="button"
             variant="secondary"
-            className="h-11 flex-1 rounded-[14px] text-sm"
+            className="h-11 flex-1 rounded-[14px] text-sm cursor-pointer"
             onClick={onCancel}
           >
             {cancelLabel}
@@ -86,7 +86,7 @@ function ConfirmDialog({
           <Button
             type="button"
             variant={destructive ? "destructive" : "default"}
-            className="h-11 flex-1 rounded-[14px] text-sm"
+            className="h-11 flex-1 rounded-[14px] text-sm cursor-pointer"
             onClick={onConfirm}
           >
             {confirmLabel}

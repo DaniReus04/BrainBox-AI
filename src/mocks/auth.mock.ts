@@ -1,6 +1,7 @@
 import type { InternalAxiosRequestConfig } from "axios";
 
 import { api } from "@/services/api";
+import { hashText } from "@/utils/hash";
 
 const USERS_KEY = "brainbox_users";
 
@@ -64,11 +65,12 @@ api.interceptors.request.use((config) => {
       if (exists) {
         throw createMockError("Email already registered", cfg, 409);
       }
+      const hashedPassword = await hashText(body.password);
       const newUser: StoredUser = {
         id: crypto.randomUUID(),
         fullName: body.fullName,
         email: body.email,
-        password: body.password,
+        password: hashedPassword,
         onboardingDone: false,
       };
       users.push(newUser);
@@ -79,10 +81,11 @@ api.interceptors.request.use((config) => {
 
     if (cfg.url === "/api/auth/login" && cfg.method === "post") {
       const users = getUsers();
+      const hashedPassword = await hashText(body.password);
       const user = users.find(
         (u) =>
           u.email.toLowerCase() === body.email.toLowerCase() &&
-          u.password === body.password,
+          u.password === hashedPassword,
       );
       if (!user) {
         throw createMockError("Invalid email or password", cfg, 401);
@@ -92,6 +95,21 @@ api.interceptors.request.use((config) => {
         { user: safe, token: `mock-token-${user.id}` },
         cfg,
       );
+    }
+
+    if (cfg.url === "/api/auth/change-password" && cfg.method === "post") {
+      const users = getUsers();
+      const idx = users.findIndex((u) => u.id === body.userId);
+      if (idx === -1) {
+        throw createMockError("User not found", cfg, 404);
+      }
+      const hashedCurrent = await hashText(body.currentPassword);
+      if (users[idx].password !== hashedCurrent) {
+        throw createMockError("Invalid current password", cfg, 401);
+      }
+      users[idx].password = await hashText(body.newPassword);
+      saveUsers(users);
+      return createMockResponse({ success: true }, cfg);
     }
 
     if (cfg.url === "/api/auth/onboarding-done" && cfg.method === "post") {

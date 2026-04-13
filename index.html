@@ -14,11 +14,11 @@
   <title>BrainBox AI</title>
   <script>
     (() => {
-          var stored = localStorage.getItem("brainbox_theme");
-          var theme =
-            stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-          if (theme === "dark") document.documentElement.classList.add("dark");
-        })();
+              var stored = localStorage.getItem("brainbox_theme");
+              var theme =
+                stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+              if (theme === "dark") document.documentElement.classList.add("dark");
+            })();
   </script>
 </head>
 
