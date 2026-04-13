@@ -72,7 +72,9 @@ describe("App", () => {
     await act(() => vi.advanceTimersByTime(3000));
     vi.useRealTimers();
     await waitFor(() => {
-      expect(screen.getByText("Home — Coming soon")).toBeInTheDocument();
+      expect(
+        screen.getByText("Start your AI conversation"),
+      ).toBeInTheDocument();
     });
   });
 });
